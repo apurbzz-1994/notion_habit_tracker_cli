@@ -12,17 +12,17 @@ Well, now you can! With this CLI tool (nhabittracker, for short), you're able to
 
 For dynamically setting up the dashboard in Notion:
 ```
-nhabittracker setup dashboard your_dashboard_name
+nhabittracker setup dashboard "your_dashboard_name"
 ```
 
 For creating a habit that you'd like to track:
 ```
-nhabittracker create your_habit_name
+nhabittracker create "your_habit_name"
 ```
 
 For adding a streak to the streak counter for the habit:
 ```
-nhabittracker add your_habit_name
+nhabittracker add "your_habit_name"
 ```
 
 
