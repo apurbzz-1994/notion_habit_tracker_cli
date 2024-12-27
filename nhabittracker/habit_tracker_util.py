@@ -1,10 +1,11 @@
 import requests
 from datetime import datetime, timezone, timedelta
-from dotenv import load_dotenv
+from dotenv import load_dotenv, set_key
 import os
 
 load_dotenv()
 
+ENV_PATH = ".env"
 NOTION_TOKEN = os.getenv("NOTION_SECRET")
 PAGE_ID = os.getenv("PAGE_ID")
 
@@ -92,8 +93,10 @@ def create_db_in_notion(page_id, db_name, props):
 
     }
 
-    #request here, possibly in a try-catch block
-    send_post_request_to_notion(endpoint, payload)
+    result = send_post_request_to_notion(endpoint, payload)
+
+    #return id to be stored as secret
+    return result['id']
 
 
 def initialise_notion_dashboard_page(page_id, main_db_name):
@@ -127,58 +130,20 @@ def initialise_notion_dashboard_page(page_id, main_db_name):
         }
      }
     
-    create_db_in_notion(page_id, main_db_name, main_db_properties)
-    create_db_in_notion(page_id, "Streak Counter ️‍🔥", streak_count_db_properties)
+    main_db_id = create_db_in_notion(page_id, main_db_name, main_db_properties)
+    count_db_id = create_db_in_notion(page_id, "Streak Counter ️‍🔥", streak_count_db_properties)
 
-    print(f"Yay! 😇 Your Notion dashboard is now ready here: https://www.notion.so/Python-Script-Test-Page-{page_id}")
+    #set ids as secrets
+    set_key(ENV_PATH,"MAIN_DB", main_db_id)
+    set_key(ENV_PATH,"COUNT_DB", count_db_id)
+
+    print(f"Yay! 😇 Your Notion dashboard is now ready! Feel free to change the layout to your liking!")
 
 
-
-'''
-db_to_find values:
-main_db
-count_db
-'''
-def find_database_id_in_notion(page_id, db_to_find):
-    endpoint = f"https://api.notion.com/v1/blocks/{page_id}/children"
-
-    database_id = None
-
-    use_db_id = os.getenv("USE_DB_IDS")
-
-    if use_db_id == "NO":
-        all_page_blocks = send_get_request_to_notion(endpoint)["results"]
-
-        #loop through blocks to find any database block
-        #then, do a name match (the last word should be Streak)
-        for each_block in all_page_blocks:
-            if each_block['type'] == "child_database":
-                database_title = each_block['child_database']['title']
-
-                if db_to_find == "main_db":
-                    database_title_split = database_title.split(" ")
-                    keyword_search = database_title_split[len(database_title_split) - 1]
-                    #only consider if database name has a keyword match
-                    if keyword_search.lower() == "streak":
-                        database_id = each_block["id"]
-                elif db_to_find == "count_db":
-                    if "streak counter" in database_title.lower():
-                        database_id = each_block["id"]
-                else:
-                    print("Script Erro: db_to_find can only look for main_db and count_db")
-    else:
-        if db_to_find == "main_db":
-            database_id = os.getenv("MAIN_DB_ID")
-        elif db_to_find == "count_db":
-            database_id = os.getenv("COUNT_DB_ID")
-        else:
-            print("Script Erro: db_to_find can only look for main_db and count_db")
-    return database_id
-    
 
 
 def find_streak_from_count_db(page_id, streak_name):
-    db_id = find_database_id_in_notion(page_id, 'count_db')
+    db_id = os.getenv("COUNT_DB")
     endpoint = f"https://api.notion.com/v1/databases/{db_id}/query"
 
 
@@ -199,52 +164,18 @@ def find_streak_from_count_db(page_id, streak_name):
 
 def add_streak_page_to_notion_db(page_id, streak_name, streak_date_entry):
     endpoint = "https://api.notion.com/v1/pages"
-    db_id = find_database_id_in_notion(page_id,'main_db')
+    db_id = os.getenv("MAIN_DB")
 
-    payload = {
-        "parent": { "database_id": db_id },
+    status_code = "no-error"
 
-        #database columns
-        "properties": {
-            "Title": {
-                "title": [
-				{
-					"text": {
-						"content": streak_name
-					}
-				}
-			]
-            },
-            "Date": {
-                "date": {"start": streak_date_entry, "end": None}
-            },
-            "Streak Type": {
-                "select": {
-                   "name": streak_name
-                }
-            },
-        }
-    }
-    #append streak page to database
-    send_post_request_to_notion(endpoint, payload)
-
-
-
-def add_new_streak_to_count_db(page_id, streak_name):
-    endpoint = "https://api.notion.com/v1/pages"
-    db_id = find_database_id_in_notion(page_id,'count_db')
-
-    #add a check here so that an existing streak cannot be entered twice
-    streak_check = find_streak_from_count_db(page_id, streak_name)
-
-    #no result means streak doesn't already exist, so can go ahead
-    if len(streak_check['results']) == 0:
+    # check to see if database id was previously stored in secret
+    if db_id != None:
         payload = {
             "parent": { "database_id": db_id },
 
-            #database row appended with no date and count set to zero
+            #database columns
             "properties": {
-                "Streak": {
+                "Title": {
                     "title": [
                     {
                         "text": {
@@ -253,17 +184,75 @@ def add_new_streak_to_count_db(page_id, streak_name):
                     }
                 ]
                 },
-                "Streak Count": {
-                    "number": 0
+                "Date": {
+                    "date": {"start": streak_date_entry, "end": None}
+                },
+                "Streak Type": {
+                    "select": {
+                    "name": streak_name
+                    }
                 },
             }
         }
         #append streak page to database
         send_post_request_to_notion(endpoint, payload)
-        print(f"Habit {streak_name} created! 🌻🌻")
-        print("Feel free to start traking this daily anytime by adding a streak using the 'add' command")
     else:
-        print(f"{streak_name} already exists!")
+        print("Sorry, it seems you haven't set up the Calendar database or the dashboard yet! 😓")
+        print("You can set it up by using the 'setup' command. Use 'nhabittracker setup -h' for more information")
+        status_code = "error"
+
+    return status_code
+
+
+def add_new_streak_to_count_db(page_id, streak_name):
+    endpoint = "https://api.notion.com/v1/pages"
+    db_id = os.getenv("COUNT_DB")
+
+    # check to see if database id was previously stored in secrets
+    if db_id != None:
+        #add a check here so that an existing streak cannot be entered twice
+        streak_check = find_streak_from_count_db(page_id, streak_name)
+        
+        if streak_check['object'] != 'error':
+            #no result means streak doesn't already exist, so can go ahead
+            if len(streak_check['results']) == 0:
+                payload = {
+                    "parent": { "database_id": db_id },
+
+                    #database row appended with no date and count set to zero
+                    "properties": {
+                        "Streak": {
+                            "title": [
+                            {
+                                "text": {
+                                    "content": streak_name
+                                }
+                            }
+                        ]
+                        },
+                        "Streak Count": {
+                            "number": 0
+                        },
+                    }
+                }
+                #append streak page to database
+                send_post_request_to_notion(endpoint, payload)
+                print(f"Habit {streak_name} created! 🌻🌻")
+                print("Feel free to start traking this daily anytime by adding a streak using the 'add' command")
+            else:
+                print(f"{streak_name} already exists!")
+        #if database could not be fetched, possibly due to stored id being invalid
+        else:
+            if streak_check['code'] == 'object_not_found':
+                print("The streak count database was not found")
+                print("Recommendation: Use the 'setup' command to recreate them")
+            else:
+                print("An error has occured due to stored database id being invalid")
+    
+                print("Recommendation: Use the 'setup' command to recreate them")
+    else:
+        print("Sorry, it seems you haven't set up the dashboard yet! 😓")
+        print("You can set it up by using the 'setup' command. Use 'nhabittracker setup -h' for more information")
 
 
 
@@ -291,57 +280,70 @@ def record_streak(page_id, streak):
     found_streak = find_streak_from_count_db(page_id, streak)
     streak_date_entry = datetime.now().astimezone(timezone.utc).isoformat()
     
-    #if streak not found, prompt user to create one
-    if len(found_streak['results']) == 0:
-        print("This habit was not found 😞")
-        print("Please use the 'create' command to add a habit before starting a streak")
-    #streak found
-    else:
-        streak_count = found_streak['results'][0]['properties']['Streak Count']['number']
-        streak_page_id = found_streak['results'][0]['id']
-
-        #this is a new streak that is being entered
-        if streak_count == 0:
-            update_streak_counter_value(streak_page_id, 1, streak_date_entry)
-            add_streak_page_to_notion_db(page_id, streak, streak_date_entry)
-            print(f"Streak added! 🤩 Congrats on starting {streak}🎉🎉🎉🥳! This is day 1")
-        #streak is already going
-        #check if gaps in streak
+    if found_streak['object'] != 'error':
+        #if streak not found, prompt user to create one
+        if len(found_streak['results']) == 0:
+            print("This habit was not found 😞")
+            print("Please use the 'create' command to add a habit before starting a streak")
+        #streak found
         else:
-            last_streak_date = found_streak['results'][0]['properties']['Last Recorded']['date']['start']
-            last_streak_date_obj = datetime.strptime(last_streak_date, "%Y-%m-%dT%H:%M:%S.%f%z")
-            now_streak_date_obj = datetime.strptime(streak_date_entry, "%Y-%m-%dT%H:%M:%S.%f%z")
-            streak_daily_limit_date_obj = last_streak_date_obj + timedelta(hours = 24)
-            streak_end_limit_date_obj = streak_daily_limit_date_obj + timedelta(hours = 24)
+            streak_count = found_streak['results'][0]['properties']['Streak Count']['number']
+            streak_page_id = found_streak['results'][0]['id']
 
-            time_difference = now_streak_date_obj - last_streak_date_obj
-            days = time_difference.days
-
-            #adding a check here so that last streak date cannot be in the future
-            if last_streak_date_obj > now_streak_date_obj:
-                print("Script Error: Last recorded streak cannot be in the future. It seems you may have manually made changes to the Notion DB")
+            #this is a new streak that is being entered
+            if streak_count == 0:
+                error_status = add_streak_page_to_notion_db(page_id, streak, streak_date_entry)
+                
+                if error_status != "error":
+                    update_streak_counter_value(streak_page_id, 1, streak_date_entry)
+                    print(f"Streak added! 🤩 Congrats on starting {streak}🎉🎉🎉🥳! This is day 1")
+            #streak is already going
+            #check if gaps in streak
             else:
-                #this means streak has already been entered for the day
-                if now_streak_date_obj > last_streak_date_obj and now_streak_date_obj < streak_daily_limit_date_obj:
-                    print(f"You've already done {streak} for the day. Good job!💪💪")
-                    #streak is still going, increment by correct amount
+                last_streak_date = found_streak['results'][0]['properties']['Last Recorded']['date']['start']
+                last_streak_date_obj = datetime.strptime(last_streak_date, "%Y-%m-%dT%H:%M:%S.%f%z")
+                now_streak_date_obj = datetime.strptime(streak_date_entry, "%Y-%m-%dT%H:%M:%S.%f%z")
+                streak_daily_limit_date_obj = last_streak_date_obj + timedelta(hours = 24)
+                streak_end_limit_date_obj = streak_daily_limit_date_obj + timedelta(hours = 24)
+
+                time_difference = now_streak_date_obj - last_streak_date_obj
+                days = time_difference.days
+
+                #adding a check here so that last streak date cannot be in the future
+                if last_streak_date_obj > now_streak_date_obj:
+                    print("Script Error: Last recorded streak cannot be in the future. It seems you may have manually made changes to the Notion DB")
                 else:
-                    if now_streak_date_obj > streak_daily_limit_date_obj and now_streak_date_obj < streak_end_limit_date_obj:
-                        new_streak_count = streak_count + 1
-                        update_streak_counter_value(streak_page_id, new_streak_count, streak_date_entry)
-                        add_streak_page_to_notion_db(page_id, streak, streak_date_entry)
-                        print(f"Streak added for the day! Good on you for continuing to {streak} for {new_streak_count} days straight! 😺💪💪")
+                    #this means streak has already been entered for the day
+                    if now_streak_date_obj > last_streak_date_obj and now_streak_date_obj < streak_daily_limit_date_obj:
+                        print(f"You've already done {streak} for the day. Good job!💪💪")
+                        #streak is still going, increment by correct amount
                     else:
-                        update_streak_counter_value(streak_page_id, 1, streak_date_entry)
-                        add_streak_page_to_notion_db(page_id, streak, streak_date_entry)
-                        print(f"Oh noes! 😭 you last did {streak} {days} days ago")
-                        print("So you gotta start over! 😔 Your streak count has been reset to 1")
+                        if now_streak_date_obj > streak_daily_limit_date_obj and now_streak_date_obj < streak_end_limit_date_obj:
+                            new_streak_count = streak_count + 1
+
+                            error_status =  add_streak_page_to_notion_db(page_id, streak, streak_date_entry)
+                            if error_status != "error":
+                                update_streak_counter_value(streak_page_id, new_streak_count, streak_date_entry)
+                                print(f"Streak added for the day! Good on you for continuing to {streak} for {new_streak_count} days straight! 😺💪💪")
+                        else:
+                            error_status = add_streak_page_to_notion_db(page_id, streak, streak_date_entry)
+
+                            if error_status != "error":
+                                update_streak_counter_value(streak_page_id, 1, streak_date_entry)
+                                print(f"Oh noes! 😭 you last did {streak} {days} days ago")
+                                print("So you gotta start over! 😔 Your streak count has been reset to 1")
+    else:
+        if found_streak['code'] == 'object_not_found':
+            print("The streak count database was not found")
+            print("Recommendation: Use the 'setup' command to recreate them")
+        else:
+            print("Sorry, it seems you haven't set up the dashboard yet! 😓")
+            print("You can set it up by using the 'setup' command. Use 'nhabittracker setup -h' for more information")
                    
 
                 
 def main():
-    initialise_notion_dashboard_page(PAGE_ID, "Apurba's 2025 Streak")
-
+    ...
 
 
 
