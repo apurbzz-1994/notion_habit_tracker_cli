@@ -23,7 +23,7 @@ In progress
 
 4. Create a `.env` file in the package directory. A  `.env.example` file has been provided for you. 
 
-5. In the `.env` file, `NOTION_SECRET` is your Internal Integration Secret. To generate this, create an Internal Integration from here: [Your Notion Interations Dashboard](https://www.notion.so/profile/integrations). More information about how to set this up can be found here - [Install via internal integration token](https://www.notion.com/help/add-and-manage-connections-with-the-api#install-from-a-developer)
+5. In the `.env` file, `NOTION_SECRET` is your Internal Integration Secret. To generate this, create an Internal Integration from your Notion account here: [Your Notion Interations Dashboard](https://www.notion.so/profile/integrations). More information about how to set this up can be found here - [Install via internal integration token](https://www.notion.com/help/add-and-manage-connections-with-the-api#install-from-a-developer)
 
 6. In the `.env` file, `PAGE_ID` is the identifier for a blank page where you'd like to set up your Habit Tracker dashboard. To do this, create a new page and make sure your Integration created in step 5 is connected (more on this here: [Add connection to pages](https://www.notion.com/help/add-and-manage-connections-with-the-api#add-connections-to-pages)). The page identifier is the 32 character code that can be found at the end of a Notion page URL
 
@@ -34,11 +34,12 @@ In progress
     ```
 
 > [!NOTE]
-> If you would like the tool to automatically detect the database, the word `Streak` needs to be present in the naming. If you'd like
-> to name it something else, you'll have to track the databases manually. To do this, provide values for the `MAIN_DB_ID` and
-> `COUNT_DB_ID` respectively in the `.env` file and also changing `USE_DB_IDS` to  `YES`.
-> The IDs can be located by opening the databases as a full page and then grabbing
-> the 32 character code at the end of the page URL
+> The above command essentially creates two inline databases in your Notion page - one that stores date-timestamped streaks, and the
+> other for keeping count of the streaks. The database IDs for these are automatically stored and tracked within the .env file, and 
+> you're free to change the page layout to display these databases any way you please. For instance, it's recommended to set the
+> first database to a calendar view. However, if you delete the databases and recreate them without using the CLI, the database 
+> IDs won't be automatically tracked. You can set them manually yourself in the .env file (keys being MAIN_DB and COUNT_DB), but
+> it's recommended to use the 'setup' command to regenerate them.
 
 8. After all has been setup, use the `help` feature to inspect what commands are available:
 
