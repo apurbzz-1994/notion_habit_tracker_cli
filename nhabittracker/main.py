@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
-#this needs to be hidden after testing
 PAGE_ID = os.getenv("PAGE_ID")
 
 def create(args):
