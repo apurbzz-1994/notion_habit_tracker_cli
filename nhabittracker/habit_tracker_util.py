@@ -317,7 +317,12 @@ def record_streak(page_id, streak):
                     #this means streak has already been entered for the day
                     if now_streak_date_obj > last_streak_date_obj and now_streak_date_obj < streak_daily_limit_date_obj:
                         #formatted date-time string
-                        local_timezone = pytz.timezone('Australia/Melbourne')
+                        timezone_string = os.getenv('TIMEZONE')
+                        
+                        if timezone_string == None:
+                            timezone_string = 'Australia/Melbourne'
+
+                        local_timezone = pytz.timezone(timezone_string)
                         date_to_display_obj = last_streak_date_obj.astimezone(local_timezone)
                         date_to_display = date_to_display_obj.strftime("%d-%m-%Y %I:%M%p")
 
