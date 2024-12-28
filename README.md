@@ -55,7 +55,7 @@ nhabittracker add "your_habit_name"
     nhabittracker setup dashboard "your_dashboard_name"
     ```
 
-[!NOTE]
+> [!NOTE]
 > The above command creates two inline databases on your Notion page: one for storing date-timestamped streaks and another for 
 > tracking streak counts. The database IDs are automatically stored and managed in the `.env` file, giving you the flexibility 
 > to customize your page layout. For example, it’s recommended to display the first database in a calendar view for better 
