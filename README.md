@@ -12,7 +12,7 @@ The best part? Your progress is automatically synced to a dynamically generated 
 
 ### Features
 - Transforms habit tracking into a command-line experience – Track your habits effortlessly with simple commands, seamlessly fitting into your regular workflow, whether you're running scripts or executing tasks in the terminal.
-- Seamlessly integrates with Notion – Automatically syncs with your Notion page to create and manage streaks, update streak counters, and validate entries to ensure that only one streak is logged per day for each habit.
+- Seamlessly integrates with Notion – Automatically syncs with your Notion page via the [Notion API](https://developers.notion.com/) to create and manage streaks, update streak counters, and validate entries to ensure that only one streak is logged per day for each habit.
 
 ### Available Commands
 
