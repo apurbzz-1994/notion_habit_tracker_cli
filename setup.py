@@ -16,7 +16,8 @@ setup(
         "python-dotenv==1.0.1",
         "requests==2.32.3",
         "setuptools==75.6.0",
-        "urllib3==2.2.3"
+        "urllib3==2.2.3",
+        "pytz==2024.2"
     ],  # dependencies from requirements.txt file
     entry_points={
         "console_scripts": [

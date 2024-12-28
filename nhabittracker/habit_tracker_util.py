@@ -2,6 +2,7 @@ import requests
 from datetime import datetime, timezone, timedelta
 from dotenv import load_dotenv, set_key
 import os
+import pytz
 
 load_dotenv()
 
@@ -311,11 +312,17 @@ def record_streak(page_id, streak):
 
                 #adding a check here so that last streak date cannot be in the future
                 if last_streak_date_obj > now_streak_date_obj:
-                    print("Script Error: Last recorded streak cannot be in the future. It seems you may have manually made changes to the Notion DB")
+                    print("Error: Last recorded streak cannot be in the future. It seems you may have manually made changes to the Notion DB")
                 else:
                     #this means streak has already been entered for the day
                     if now_streak_date_obj > last_streak_date_obj and now_streak_date_obj < streak_daily_limit_date_obj:
-                        print(f"You've already done {streak} for the day. Good job!💪💪")
+                        #formatted date-time string
+                        local_timezone = pytz.timezone('Australia/Melbourne')
+                        date_to_display_obj = last_streak_date_obj.astimezone(local_timezone)
+                        date_to_display = date_to_display_obj.strftime("%d-%m-%Y %I:%M%p")
+
+                        print(f"You've already done '{streak}' for the day. Good job!💪💪")
+                        print(f"Streak can be recorded again after: {date_to_display}")
                         #streak is still going, increment by correct amount
                     else:
                         if now_streak_date_obj > streak_daily_limit_date_obj and now_streak_date_obj < streak_end_limit_date_obj:
