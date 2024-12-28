@@ -4,9 +4,11 @@ A Python CLI for tracking daily habits with Notion
 ![first version screenshot](/git_assets/main_image.png)
 
 ## Introduction
-Conventional habit trackers usually comprise of check-boxes that you tick or calendar days that you can cross out. But as someone working in the IT industry, nothing can be more satisfying than opening a termainl and hitting that enter key to execute a command, run a script or push code to GitHub. What if you could add and track your habit streaks the same way, as if you're commiting code?
+Conventional habit trackers usually comprise of check-boxes that you tick or calendar days that you can cross out. But as someone working in the IT industry, nothing can be more satisfying than opening a termainl and hitting that enter key to execute a command, run a script or push code to GitHub. What if you could add and track your habit streaks the same way, as if you're committing code?
 
-Well, now you can! With this CLI tool (nhabittracker, for short), you're able to track habits by executing commands via a Terminal, as if you're making a commit and pushing the habit. What's even cooler is that everything gets pushed to a Notion dashboard (that this tool will dynamically generate for you) so that you can visually compare your progress and reflect, as needed.
+Well, now you can! Introducing nhabittracker, a CLI tool that lets you track habits right from the terminal. With simple commands, you can “commit” your habits as if you’re pushing code, combining productivity with the joy of the command line.
+
+The best part? Your progress is automatically synced to a dynamically generated Notion dashboard, giving you a visual way to compare, analyse, and reflect on your streaks—all without ever leaving your workflow.
 
 ### Available Commands
 
