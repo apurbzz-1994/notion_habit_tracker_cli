@@ -55,13 +55,15 @@ nhabittracker add "your_habit_name"
     nhabittracker setup dashboard "your_dashboard_name"
     ```
 
-> [!NOTE]
-> The above command essentially creates two inline databases in your Notion page - one that stores date-timestamped streaks, and the
-> other for keeping count of the streaks. The database IDs for these are automatically stored and tracked within the .env file, and 
-> you're free to change the page layout to display these databases any way you please. For instance, it's recommended to set the
-> first database to a calendar view. However, if you delete the databases and recreate them without using the CLI, the database 
-> IDs won't be automatically tracked. You can set them manually yourself in the .env file (keys being MAIN_DB and COUNT_DB), but
-> it's recommended to use the 'setup' command to regenerate them.
+[!NOTE]
+> The above command creates two inline databases on your Notion page: one for storing date-timestamped streaks and another for 
+> tracking streak counts. The database IDs are automatically stored and managed in the `.env` file, giving you the flexibility 
+> to customize your page layout. For example, it’s recommended to display the first database in a calendar view for better 
+> visualization. However, if you delete and recreate the databases outside of the CLI, their IDs will no longer be 
+> tracked automatically. In such cases, you can manually update the `.env` file with the appropriate 
+> IDs (`MAIN_DB` and `COUNT_DB`). That said, it’s best to use the `setup` command to regenerate the databases and ensure 
+> seamless integration.
+
 
 8. After all has been setup, use the `help` feature to inspect what commands are available:
 
