@@ -49,7 +49,9 @@ nhabittracker add "your_habit_name"
 
 6. In the `.env` file, `PAGE_ID` is the identifier for a blank page where you'd like to set up your Habit Tracker dashboard. To do this, create a new page and make sure your Integration created in step 5 is connected (more on this here: [Add connection to pages](https://www.notion.com/help/add-and-manage-connections-with-the-api#add-connections-to-pages)). The page identifier is the 32 character code that can be found at the end of a Notion page URL
 
-7. The `NOTION_SECRET` and `PAGE_ID` is the bare minimum to use the CLI. You can now use the following command to dynamically create the dashboard setup for habit tracking, which involves creating two databases:
+7. You can select a timezone (set to Australia/Melbourne by default) so that certain messages will display the correct time. To do this, add a `TIMEZONE` key to the `.env` file and add the code for your desired timezone. All timezone codes can be found [here](https://gist.github.com/heyalexej/8bf688fd67d7199be4a1682b3eec7568).
+
+8. The `NOTION_SECRET` and `PAGE_ID` is the bare minimum to use the CLI. You can now use the following command to dynamically create the dashboard setup for habit tracking, which involves creating two databases:
 
     ```
     nhabittracker setup dashboard "your_dashboard_name"
@@ -65,7 +67,7 @@ nhabittracker add "your_habit_name"
 > seamless integration.
 
 
-8. After all has been setup, use the `help` feature to inspect what commands are available:
+9. After all has been setup, use the `help` feature to inspect what commands are available:
 
     ```
     nhabittracker -h
