@@ -325,7 +325,7 @@ def record_streak(page_id, streak):
                             timezone_string = 'Australia/Melbourne'
 
                         local_timezone = pytz.timezone(timezone_string)
-                        date_to_display_obj = last_streak_date_obj.astimezone(local_timezone)
+                        date_to_display_obj = streak_daily_limit_date_obj.astimezone(local_timezone)
                         date_to_display = date_to_display_obj.strftime("%d-%m-%Y %I:%M%p")
 
                         print(f"You've already done '{streak}' for the day. Good job!💪💪")
