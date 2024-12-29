@@ -1,4 +1,5 @@
 import requests
+import nhabittracker
 from datetime import datetime, timezone, timedelta
 from dotenv import load_dotenv, set_key
 import os
@@ -6,7 +7,8 @@ import pytz
 
 load_dotenv()
 
-ENV_PATH = ".env"
+library_path = os.path.dirname(nhabittracker.__file__)
+ENV_PATH = os.path.abspath(f"{library_path}/.env")
 NOTION_TOKEN = os.getenv("NOTION_SECRET")
 PAGE_ID = os.getenv("PAGE_ID")
 
