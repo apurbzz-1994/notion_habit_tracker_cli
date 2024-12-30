@@ -77,4 +77,4 @@ nhabittracker add "your_habit_name" -m "optional message"
 - Rewriting some of the code to make it more Object Oriented
 - CLI feature - to be able to add multiple streaks for the day with the same command
 - ~~CLI feature - an optional argument to be able to add a note to a streak that goes to the streak’s page in Notion, kind of like a commit message~~ 
-- Data export feature with date filter so that it can be imported to data viz platforms
+- Data export feature with date filter for data backup or import to other platforms (for creating visualisations, for example)
