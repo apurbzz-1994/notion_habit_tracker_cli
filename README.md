@@ -26,9 +26,9 @@ For creating a habit that you'd like to track:
 nhabittracker create "your_habit_name"
 ```
 
-For adding a streak to the streak counter for the habit:
+For incrementing the streak-counter for the habit. This also supports adding an optional message:
 ```
-nhabittracker add "your_habit_name"
+nhabittracker add "your_habit_name" -m "optional message"
 ```
 
 
