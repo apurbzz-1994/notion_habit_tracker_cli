@@ -163,9 +163,28 @@ def find_streak_from_count_db(page_id, streak_name):
     return response
 
 
+def add_message_to_streak_entry(page_id, m):
+    endpoint = f"https://api.notion.com/v1/blocks/{page_id}/children"
+
+    payload = {
+        "children": [
+            {
+			
+            "object": "block",
+			"type": "paragraph",
+			"paragraph": {
+				"rich_text": [{ "type": "text", "text": { "content": m} }]
+			}
+		}
+        ]
+    }
+
+    send_patch_request_to_notion(endpoint, payload)
 
 
-def add_streak_page_to_notion_db(page_id, streak_name, streak_date_entry):
+
+
+def add_streak_page_to_notion_db(page_id, streak_name, streak_date_entry, message = None):
     endpoint = "https://api.notion.com/v1/pages"
     db_id = os.getenv("MAIN_DB")
 
@@ -198,7 +217,13 @@ def add_streak_page_to_notion_db(page_id, streak_name, streak_date_entry):
             }
         }
         #append streak page to database
-        send_post_request_to_notion(endpoint, payload)
+        result = send_post_request_to_notion(endpoint, payload)
+        new_page_id = result['id']
+
+        #for when the user has a message to append to the newly created streak page
+        if message != None:
+            add_message_to_streak_entry(new_page_id, message) 
+
     else:
         print("Sorry, it seems you haven't set up the Calendar database or the dashboard yet! 😓")
         print("You can set it up by using the 'setup' command. Use 'nhabittracker setup -h' for more information")
@@ -277,7 +302,7 @@ def update_streak_counter_value(page_id, new_value, streak_date_entry):
         send_patch_request_to_notion(endpoint, payload)
 
 
-def record_streak(page_id, streak):
+def record_streak(page_id, streak, add_message = None):
     #query the streak from count DB, should return empty list if not found 
     #and only one response if found
     found_streak = find_streak_from_count_db(page_id, streak)
@@ -295,7 +320,7 @@ def record_streak(page_id, streak):
 
             #this is a new streak that is being entered
             if streak_count == 0:
-                error_status = add_streak_page_to_notion_db(page_id, streak, streak_date_entry)
+                error_status = add_streak_page_to_notion_db(page_id, streak, streak_date_entry, add_message)
                 
                 if error_status != "error":
                     update_streak_counter_value(streak_page_id, 1, streak_date_entry)
@@ -335,12 +360,12 @@ def record_streak(page_id, streak):
                         if now_streak_date_obj > streak_daily_limit_date_obj and now_streak_date_obj < streak_end_limit_date_obj:
                             new_streak_count = streak_count + 1
 
-                            error_status =  add_streak_page_to_notion_db(page_id, streak, streak_date_entry)
+                            error_status =  add_streak_page_to_notion_db(page_id, streak, streak_date_entry, add_message)
                             if error_status != "error":
                                 update_streak_counter_value(streak_page_id, new_streak_count, streak_date_entry)
                                 print(f"Streak added for the day! Good on you for continuing to {streak} for {new_streak_count} days straight! 😺💪💪")
                         else:
-                            error_status = add_streak_page_to_notion_db(page_id, streak, streak_date_entry)
+                            error_status = add_streak_page_to_notion_db(page_id, streak, streak_date_entry, add_message)
 
                             if error_status != "error":
                                 update_streak_counter_value(streak_page_id, 1, streak_date_entry)

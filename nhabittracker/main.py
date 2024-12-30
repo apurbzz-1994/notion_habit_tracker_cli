@@ -10,7 +10,11 @@ def create(args):
     add_new_streak_to_count_db(PAGE_ID, args.streak_name)
 
 def add(args):
-    record_streak(PAGE_ID, args.streak_name)
+    #if user is wanting to add a message
+    if args.message:
+        record_streak(PAGE_ID, args.streak_name, args.message)
+    else:
+        record_streak(PAGE_ID, args.streak_name)
 
 def setup(args):
     if args.setup_name.lower() == "dashboard":
@@ -20,7 +24,7 @@ def setup(args):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="This CLI allow you to create and add daily streaks to a Notion dasboard")
+    parser = argparse.ArgumentParser(description="This CLI allow you to create and add daily streaks to a Notion dashboard")
     subparsers = parser.add_subparsers(help="Available subcommands")
 
     #create subcommand
@@ -31,6 +35,7 @@ def main():
     #add subcommand
     add_parser = subparsers.add_parser("add", help="Start a streak or add a daily streak")
     add_parser.add_argument("streak_name", help="Name of the habit that you'd like to add a streak count for")
+    add_parser.add_argument("-m", "--message", help="Add this flag if you're wanting to add a message to your streak page", required=False)
     add_parser.set_defaults(func=add)
 
     #setup subcommand
