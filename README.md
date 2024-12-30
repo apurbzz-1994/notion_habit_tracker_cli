@@ -16,7 +16,7 @@ The best part? Your progress is automatically synced to a dynamically generated 
 
 ### Available Commands
 
-For dynamically setting up the dashboard in Notion:
+For dynamically setting up the dashboard for the first time in Notion:
 ```
 nhabittracker setup dashboard "your_dashboard_name"
 ```
