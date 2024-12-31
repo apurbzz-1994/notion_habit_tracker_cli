@@ -21,7 +21,7 @@ For dynamically setting up the dashboard for the first time in Notion:
 nhabittracker setup dashboard "your_dashboard_name"
 ```
 
-For creating/initialising a habit that you'd like to track:
+For creating/initialising a habit that you'd like to track for the first time:
 ```
 nhabittracker create "your_habit_name"
 ```
